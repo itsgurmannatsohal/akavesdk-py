@@ -12,7 +12,6 @@ class ErasureCode:
         self.encoder = RSCodec(parity_blocks * 2)
 
     def encode(self, data: bytes) -> list:
-        """Splits data into shards, encodes them, and returns encoded shards."""
         try:
             shards = np.array_split(data, self.data_blocks)
             shards = [shard.tobytes() for shard in shards]
@@ -27,7 +26,6 @@ class ErasureCode:
             raise RuntimeError(f"Erasure coding failed: {str(e)}")
 
     def verify(self, encoded_shards: list) -> bool:
-        """Verifies if encoded shards are correct."""
         try:
             for shard in encoded_shards:
                 self.encoder.decode(shard, only_erasures=True)  
@@ -36,7 +34,6 @@ class ErasureCode:
             return False  
 
     def reconstruct(self, encoded_shards: list) -> list:
-        """Attempts to reconstruct missing/corrupted shards."""
         try:
             recovered_shards = []
             for shard in encoded_shards:
@@ -50,7 +47,6 @@ class ErasureCode:
             raise RuntimeError(f"Reconstruction failed: {str(e)}")
 
     def extract_data(self, encoded_shards: list, original_data_size: int) -> bytes:
-        """Extracts the original data from encoded shards, verifying and reconstructing if needed."""
         if not self.verify(encoded_shards):
             encoded_shards = self.reconstruct(encoded_shards)
 
